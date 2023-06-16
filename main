@@ -79,43 +79,50 @@ def preprocessing(pose_results):
 # Route untuk halaman utama
 @app.route("/")
 def home():
-    return render_template('home.html')
+    return render_template("home.html")
+
 
 @app.route("/about")
 def about():
     return render_template("about.html")
 
+
 @app.route("/aithernals")
 def aithernals():
     return render_template("aithernals.html")
+
 
 @app.route("/sejarah_silat")
 def sejarah_silat():
     return render_template("sejarah_silat.html")
 
+
 @app.route("/gerakan_silat")
 def gerakan_silat():
     return render_template("gerakan_silat.html")
+
 
 @app.route("/index")
 def index():
     return render_template("index.html")
 
+
 @app.route("/waktu_sehat")
 def waktu_sehat():
     return render_template("waktu_sehat.html")
 
+
 # Route untuk menerima dan memproses unggahan gambar
-@app.route('/upload', methods=['POST'])
+@app.route("/upload", methods=["POST"])
 def upload():
     # Terima file gambar dari form
-    image = request.files['file']
+    image = request.files["file"]
 
     # Simpan gambar ke disk
-    image.save('static/uploads/' + image.filename)
+    image.save("static/uploads/" + image.filename)
 
     # Baca gambar menggunakan OpenCV
-    img = cv2.imread('static/uploads/' + image.filename)
+    img = cv2.imread("static/uploads/" + image.filename)
 
     # Deteksi pose menggunakan MediaPipe
     with mp_pose.Pose(static_image_mode=True, min_detection_confidence=0.5) as pose:
@@ -127,14 +134,16 @@ def upload():
         # Praproses pose menjadi fitur input
         body_keypoints = preprocessing(results)
         body_keypoints = np.expand_dims(body_keypoints, axis=0)
-        predicted_class = label_encoder.inverse_transform(model.predict(body_keypoints))[0]
+        predicted_class = label_encoder.inverse_transform(
+            model.predict(body_keypoints)
+        )[0]
     else:
         predicted_class = "Pose not detected"
 
     return render_template(
-        'results.html', image=image.filename, predicted_class=predicted_class
+        "results.html", image=image.filename, predicted_class=predicted_class
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
